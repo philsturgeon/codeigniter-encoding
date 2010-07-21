@@ -1,8 +1,10 @@
-CodeIgniter-Prowl
-=================
+CodeIgniter-Encoding
+====================
 
-Send iPhone notifications from your CodeIgniter application with the Prowl library.
-Based on the PHP Prowl from Leon Bayliss and cleaned up.
+Encode audio and video using the encoding.com API and service. Supports
+Windows Media formats, QuickTime, Ogg, all sorts of stuff!
+
+	http://www.encoding.com/wdocs/ApiDoc
 
 
 Requirements
@@ -10,36 +12,39 @@ Requirements
 
 1. PHP 5.1+
 2. CodeIgniter 1.6.x - 2.0-dev
-3. iPhone with [Prowl App](http://itunes.apple.com/app/prowl-growl-client/id320876271?mt=8)
-3. [Prowl account](https://prowl.weks.net/register.php)
+3. PHP 5 (configured with cURL enabled)
+4. libcurl
 
 
 Usage
 -----
 
-	$config['username'] = 'KanyeWest';
-	$config['password'] ='douch3b4g1977';
+	$config['id'] = 'user_id';
+	$config['key'] ='user_key';
 	
-	// optional. Defaults to CI Prowl
-	$config['application'] = "Kayne's Calender";
-	
-	$this->load->library('prowl', $config);
-	
-	$result = $this->prowl->send('Reminder', 'Be an idiot in public.');
-	
-	print_r($result);
+	$this->load->library('encoding', $config);
 
-Simple as that! 
+	$upload_file = 'ftp://ftp_user:ftp_pass@example.com/httpdocs/uploads/somefile.mp4';
 
+	$result = $this->encoding->encode($upload_file, array(
+		'output' 				=> 'fl9',
+		'size' 					=> '640x360',
+		'bitrate' 				=> '600k',
+		'audio_bitrate' 		=> '64k',
+		'audio_sample_rate' 	=> 44100,
+		'audio_channels_number' =>  2,
+	);
 
-To-do
------
+	// Notify the correct domain when encoding is complete
+	$this->encoding->notify('controller_or_url');
 
-I'll add a config file for it at some point.
+	// Displaying error if any
+	if (!$result || $this->encoding->error_string())
+	{
+		show_error($this->encoding->error_string()
+	}
 
-
-Extra
------
-
-If you'd like to request changes, report bug fixes, or contact
-the developer of this library, email <email@philsturgeon.co.uk>
+	else
+	{
+		exit('And now we play the waiting game!');
+	}

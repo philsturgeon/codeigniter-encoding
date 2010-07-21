@@ -19,6 +19,8 @@
  */
 class Encoding
 {
+    private $_ci;                // CodeIgniter instance
+	
 	private $user_id = 0;
 	private $user_key = '';
 
@@ -41,6 +43,8 @@ class Encoding
 	 */
 	function __construct($params = array())
 	{
+		$this->_ci =& get_instance();
+		
 		log_message('debug', 'Encoding Initialized');
 
 		isset($params['id']) || $this->user_id = $params['id'];
@@ -53,19 +57,53 @@ class Encoding
 	    $this->request->addChild('userkey', $this->user_key);
 	}
 
-	function notify($url)
+	// --------------------------------------------------------------------
+
+	/**
+	 * Notify URL
+	 *
+	 * @access    Public
+	 * @param     string	$url	URL (or controller) the API should poke when encoding is done
+	 * @return    none
+	 */
+	function notify($url = '')
 	{
+		// If no a protocol in URL, assume its a CI link
+        if (!preg_match('!^\w+://! i', $url))
+        {
+            $this->_ci->load->helper('url');
+            $url = site_url($url);
+        }
+		
 	    $this->request->addChild('notify', $url);
 	    return $this;
 	}
 
+	// --------------------------------------------------------------------
+
+	/**
+	 * Media ID
+	 *
+	 * @access    Public
+	 * @param     int	$id		Set the Media ID to something
+	 * @return    none
+	 */
 	function media_id($id)
 	{
 	    $this->request->addChild('MediaID', $id);
 	    return $this;
 	}
 
-	function encode($file, $properties)
+	// --------------------------------------------------------------------
+
+	/**
+	 * Encode
+	 *
+	 * @access    Public
+	 * @param     string	$file	Path to the file you wish to encode (including FTP stuff
+	 * @return    none
+	 */
+	function encode($file, $properties = array())
 	{
 	    // Preparing XML request
 
